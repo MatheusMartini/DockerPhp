@@ -14,26 +14,44 @@ $uriSegments = explode("/", $rout);
 
 if(isset($uriSegments[1])){	
 	switch($uriSegments[1]){
-		case 'clients':
-			require_once("controllers/ClientController.php");
-			$client = new ClientController();
+		case 'client':
+			require_once('controllers/UserController.php');
+			$user = new UserController();
+			if($user -> isAdmin()){
+				require_once("controllers/ClientController.php");
+				$client = new ClientController();
+				switch($request_method){
+					case 'GET':
+						if(!isset($uriSegments[2]))
+							$client -> listClients();
+						else
+							$client -> listClient($uriSegments[2]);
+					break;
+					case 'POST':
+						$client -> createClient();
+					break;
+					case 'PUT':
+						$client -> updateClient($uriSegments[2]);
+					break;
+					case 'DELETE':
+						$client -> deleteClient($uriSegments[2]);
+					break;
+				}
+			}
+		break;
+
+		case 'user':
+			require_once('controllers/UserController.php');
+			$user = new UserController();
+
 			switch($request_method){
 				case 'GET':
-					if(!isset($uriSegments[2]))
-						$client -> listClients();
-					else
-						$client -> listClient($uriSegments[2]);
-				break;
-				case 'POST':
-					$client -> createClient();
-				break;
-				case 'PUT':
-					$client -> updateClient($uriSegments[2]);
-				break;
-				case 'DELETE':
-					$client -> deleteClient($uriSegments[2]);
+					if(isset($uriSegments[2]) && $uriSegments[2] == 'login'){
+						$user -> login();
+					}
 				break;
 			}
+
 		break;	
 	}
 }
